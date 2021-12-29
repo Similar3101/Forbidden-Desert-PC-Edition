@@ -2,7 +2,6 @@ import pygame
 
 
 try:
-    # a = input('введите через пробел 2 числа\n').split()
     a = '1100 5'.split()
     SIZE = [WIDTH, HEIGHT] = [int(a[0]), int(a[0]) - 300]
     size_of_rect = int(a[1])
@@ -11,102 +10,41 @@ except Exception:
     print('Неправильный формат ввода')
     exit()
 
+dict_of_place = {0: 'green',
+                 1: 'red',
+                 2: 'red',
+                 3: 'yellow',
+                 4: 'yellow',
+                 5: 'orange',
+                 6: 'orange',
+                 7: 'grey',
+                 8: 'grey',
+                 9: 'blue',
+                 10: 'blue',
+                 11: 'blue',
+                 12: 'brown',
+                 13: 'white',
+                 14: 'white',
+                 15: 'white',
+                 16: 'white',
+                 17: 'white',
+                 18: 'white',
+                 19: 'white',
+                 20: 'white',
+                 21: 'white',
+                 22: 'white',
+                 23: 'white',
+                 24: 'white'}
 
-class Place:
-    x = -1
+list_of_place = [1, 3, 16, 10, 14,
+          15, 6, 23, 24, 22,
+          8, 13, 12, 17, 5,
+          4, 9, 18, 19, 2,
+          20, 0, 21, 7, 11]
 
-    def __init__(self):
-        if Place.x == -1:
-            Place.x = x = 0
-            Place.y = y = 0
-        else:
-            Place.x += 1
-        y += 1 if x % 5 == 0 and x != 0 else 0
-        Place.y = y
-        if (x == 4 and y == 0) or (x == 0 and y == 2) or (x == 2 and y == 4):
-            c = 'blue'
-        elif x == 2 and y == 2:
-            c = 'black'
-        elif x == 4 and y == 3:
-            c = 'yellow'
-            Place.player = (x, y)
-        else:
-            c = 'white'
-        return None
-
-
-def krest(screen, x, y, c='orange'):
-    x += 15
-    y += 15
-    pygame.draw.circle(screen, c, (x, y), 50, 5, draw_bottom_right=True)
-    pygame.draw.line(screen, c, [x + 45, y], [x + 87, y], 5)
-    pygame.draw.circle(screen, c, (x + 135, y), 50, 5, draw_bottom_left=True)
-    pygame.draw.line(screen, c, [x + 135, y + 45], [x + 135, y + 94], 5)
-    pygame.draw.circle(screen, c, (x + 135, y + 140), 50, 5, draw_top_left=True)
-    pygame.draw.line(screen, c, [x + 45, y + 138], [x + 87, y + 138], 5)
-    pygame.draw.circle(screen, c, (x, y + 140), 50, 5, draw_top_right=True)
-    pygame.draw.line(screen, c, [x, y + 45], [x, y + 94], 5)
+opened_list = [0, 9, 10, 11, 12]
 
 
-def player(screen, x, y, c):
-    x += 75
-    y += 60
-    pygame.draw.polygon(screen, c, ([x, y], [x + 20, y], [x + 20, y + 20],
-                        [x + 10, y + 20], [x + 20, y + 40], [x, y + 40], [x + 10, y + 20],
-                                    [x, y + 20], [x, y]), 0)
-
-
-def draw(screen):
-    screen.fill(BACKGROUND)
-    lol = (HEIGHT // size_of_rect)
-
-    for i in range(WIDTH):
-        for j in range(HEIGHT):
-            x = (w := WIDTH - 300) - (w - lol * i)
-            y = (h := WIDTH - 300) - lol * j - lol
-            if (i == 4 and j == 0) or (i == 0 and j == 2) or (i == 2 and j == 4):
-                c = 'blue'
-            elif i == 2 and j == 2:
-                continue
-            elif i == 4 and j == 3:
-                c = 'yellow'
-            else:
-                c = 'white'
-            print(c, (x, y), lol, (w, h), (i, j))
-            pygame.draw.rect(screen, c, (x + 5, y + 5, lol - 10, lol - 10), 5)
-            if (i % 4 != 0 or j % 4 != 0) and (i + j) % 2 == 0:
-                # krest(screen, x, y)
-                pass
-            elif i == 0 and j == 0:
-                player(screen, x, y, 'green')
-            elif i == 4 and j == 0:
-                player(screen, x, y, 'white')
-    # krest(screen, 850, 630)
-    pygame.draw.rect(screen, 'blue', (850, 200, 150, 200), 5, border_radius=15)
-    pygame.draw.rect(screen, 'red', (850, 420, 150, 200), 5, border_radius=15)
-    pygame.draw.line(screen, 'white', (820, 0), (820, 800), 20)
-
-
-# if __name__ == '__main__':
-#     pygame.init()
-#     screen = pygame.display.set_mode(SIZE)
-#     pygame.display.set_caption('desert')
-#     draw(screen)
-#     pygame.display.flip()
-#     running = True
-#     while running:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 running = False
-#             if event.type == pygame.MOUSEBUTTONDOWN:
-#                 pass
-#         draw(screen)
-#     pygame.quit()
-
-#
-
-#
-#
 class Player:
     '''Базовый класс игроков
 от него передаются все основные хар-ки:
@@ -117,11 +55,12 @@ class Player:
         self.max_canteen = canteen
         self.equippack = []
 
-    def get_can_move(self, coords):
+    def get_can_move(self, coords, color):
         x1, y1 = self.coords
         x2, y2 = coords
-        if abs(sum((x1 - x2, y1, y2))) == 1:
-            return True
+        if (abs(x1 - x2) == 1 and y1 == y2) or (abs(y1 - y2) == 1 and x1 == x2):
+            if color != 'brown':
+                return True
         return False
 
     def move(self, coords):
@@ -137,9 +76,9 @@ class Player:
     def dig_place(self):
         pass # TODO придумать что-нибудь с раскопками
 
-    def take_detail(self):
-        pass # TODO придумать, как, где хранятся данные про детали
-
+    def take_detail(self, board, id_detail):
+        # TODO придумать, как определять детали
+        board.have_detail[id_detail] = True
 
 class Archeologist(Player):
     '''"Быстрый копатель" Археолог
@@ -164,6 +103,15 @@ class Explorer(Player):
     def __init__(self, coords=(0, 0), color='green', canteen=4):
         super().__init__(coords, color, canteen)
 
+    def get_can_move(self, coords, color):
+        x1, y1 = self.coords
+        x2, y2 = coords
+        if color != 'brown':
+            if (abs(x1 - x2) == 1 and y1 == y2) or (abs(y1 - y2) == 1 and x1 == x2):
+                return True
+            elif abs(x1 - x2) == 1 and abs(y1 - y2) == 1:
+                return True
+        return False
 
 class Meterologist(Player):
     '''Метеоролог
@@ -187,8 +135,52 @@ class WaterCarrier(Player):
         super().__init__(coords, color, canteen)
 
 
+list_of_players = [Explorer()]
+
+
+class Place:
+    '''Клетки Пустыни'''
+    def __init__(self, coords=0, image=None):
+        self.coords = [coords // 5, coords % 5]
+        self.color = dict_of_place[list_of_place[coords]] if list_of_place[coords] in opened_list else 'white'
+        self.len_of_sandblock = 0
+        self.players_on_place = [Explorer(coords=self.coords)] if self.color == 'green' else []
+        self.is_digged = False
+        self.can_move = True
+        self.image = image
+
+    def draw(self, size):
+        a, b = self.coords[0], self.coords[1]
+        x, y = (a * size) + 5, (b * size) + 5
+        if not self.is_digged:
+            pygame.draw.rect(screen, self.color, (x, y, size - 10, size - 10), 5)
+        else:
+            pygame.draw.rect(screen, self.color, (x, y, size - 10, size - 10))
+
+    def draw_sandblock(self):
+        x, y = (self.coords[0] * 160) + 10, (self.coords[1] * 160) + 10
+        pygame.draw.circle(screen, 'orange', (x, y), 50, 5, draw_bottom_right=True)
+        pygame.draw.line(screen, 'orange', [x + 45, y], [x + 87, y], 5)
+        pygame.draw.circle(screen, 'orange', (x + 135, y), 50, 5, draw_bottom_left=True)
+        pygame.draw.line(screen, 'orange', [x + 135, y + 45], [x + 135, y + 94], 5)
+        pygame.draw.circle(screen, 'orange', (x + 135, y + 140), 50, 5, draw_top_left=True)
+        pygame.draw.line(screen, 'orange', [x + 45, y + 138], [x + 87, y + 138], 5)
+        pygame.draw.circle(screen, 'orange', (x, y + 140), 50, 5, draw_top_right=True)
+        pygame.draw.line(screen, 'orange', [x, y + 45], [x, y + 94], 5)
+
+    def add_sandblock(self):
+        if not self.len_of_sandblock:
+            self.draw_sandblock()
+        self.len_of_sandblock += 1
+        if self.len_of_sandblock >= 2:
+            self.can_move = False
+
+    def add_player(self, player):
+        self.players_on_place.append(player)
+
+
 class Board:
-    def krest(self, screen, coords,  c='orange'):
+    def krest(self, screen, coords, c='orange'):
         print(coords)
         x = coords[0] + 10
         y = coords[1] + 10
@@ -204,10 +196,11 @@ class Board:
     def __init__(self, width=800, height=800, left=0, top=0, cell_size=160):
         self.width = width
         self.height = height
-        self.board = [[p := Place()] * width for _ in range(height)]
+        self.board = [[Place(a * 5 + b) for b in range(0, 5)] for a in range(0, 5)]
         self.left = left
         self.top = top
         self.cell_size = cell_size
+        self.have_detail = [False, False, False, False]
         self.krest(screen, (850, 630))
 
     def set_view(self, left, top, cell_size):
@@ -219,22 +212,19 @@ class Board:
         lol = (HEIGHT // size_of_rect)
         for j in range(5):
             for i in range(5):
-                x = (w := WIDTH - 300) - (w - lol * j)
-                y = (h := WIDTH - 300) - lol * i - lol
-                if (y == 4 and x == 0) or (y == 0 and x == 2) or (y == 2 and x == 4):
-                    c = 'blue'
-                elif y == 2 and x == 2:
-                    continue
-                elif y == 4 and x == 3:
-                    c = 'yellow'
-                else:
-                    c = 'white'
-                print(c, (x, y), lol, (w, h), (y, x))
-                pygame.draw.rect(screen, c, (x + 5, y + 5, lol - 10, lol - 10), 5)
-                if (y % 4 != 0 or x % 4 != 0) and (y + x) % 2 == 0:
-                    self.krest(screen, x, y)
-                elif y == 0 and x == 0:
-                    player(screen, x, y, 'green')
+                place = self.board[j][i]
+                place.draw(lol)
+                if (j % 4 != 0 or i % 4 != 0) and (j + i) % 2 == 0\
+                        and not (j == 2 and i == 2):
+                    place.add_sandblock()
+                for player in place.players_on_place:
+                    x, y, c = j * 160 + 75, i * 160 + 60, player.color
+                    pygame.draw.polygon(screen, c, ([x, y], [x + 20, y], [x + 20, y + 20],
+                                                    [x + 10, y + 20], [x + 20, y + 40], [x, y + 40],
+                                                    [x + 10, y + 20],
+                                                    [x, y + 20], [x, y]), 0)
+                if place.len_of_sandblock:
+                    place.draw_sandblock()
 
     def get_click(self, mouse_pos):
         pos = self.get_cell(mouse_pos)
@@ -253,6 +243,12 @@ class Board:
         return cell_x, cell_y
 
 
+def lol():
+    pygame.draw.rect(screen, 'blue', (850, 200, 150, 200), 5, border_radius=15)
+    pygame.draw.rect(screen, 'red', (850, 420, 150, 200), 5, border_radius=15)
+    pygame.draw.line(screen, 'white', (820, 0), (820, 800), 20)
+
+
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -264,104 +260,27 @@ if __name__ == '__main__':
     pygame.draw.line(screen, 'white', (820, 0), (820, 800), 20)
     pygame.display.flip()
     running = True
+    i = 0
+    player = board.board[4][1].players_on_place[0]
+    len_of_action = 4
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
+                if event.pos[0] < 800:
+                    x, y = event.pos[0] // 160, event.pos[1] // 160
+                    # print(x, y, player.get_can_move((x, y)))
+                    if len_of_action:
+                        if player.get_can_move((x, y), board.board[x][y].color):
+                            board.board[x][y].add_player(player)
+                            a, b = player.coords
+                            board.board[a][b].players_on_place = []
+                            player.coords = x, y
+                            len_of_action -= 1
+                            print((x, y), (player.coords, board.board[x][y].players_on_place), len_of_action)
+        screen.fill((0, 0, 0))
+        lol()
+        board.render(screen)
+        pygame.display.flip()
     pygame.quit()
-
-# import pygame
-# from math import pi
-#
-# # Initialize the game engine
-# pygame.init()
-#
-# # Define the colors we will use in RGB format
-# BLACK = (0, 0, 0)
-# WHITE = (255, 255, 255)
-# BLUE = (0, 0, 255)
-# GREEN = (0, 255, 0)
-# RED = (255, 0, 0)
-#
-# # Set the height and width of the screen
-# size = [400, 300]
-# screen = pygame.display.set_mode(size)
-#
-# pygame.display.set_caption("Example code for the draw module")
-#
-# # Loop until the user clicks the close button.
-# done = False
-# clock = pygame.time.Clock()
-#
-# while not done:
-#
-#     # This limits the while loop to a max of 10 times per second.
-#     # Leave this out and we will use all CPU we can.
-#     clock.tick(10)
-#
-#     for event in pygame.event.get():  # User did something
-#         if event.type == pygame.QUIT:  # If user clicked close
-#             done = True  # Flag that we are done so we exit this loop
-#
-#     # All drawing code happens after the for loop and but
-#     # inside the main while done==False loop.
-#
-#     # Clear the screen and set the screen background
-#     screen.fill(WHITE)
-#
-#     # Draw on the screen a GREEN line from (0, 0) to (50, 30)
-#     # 5 pixels wide.
-#     pygame.draw.line(screen, GREEN, [0, 0], [50, 30], 5)
-#
-#     # Draw on the screen 3 BLACK lines, each 5 pixels wide.
-#     # The 'False' means the first and last points are not connected.
-#     pygame.draw.lines(screen, BLACK, False, [[0, 80], [50, 90], [200, 80], [220, 30]], 5)
-#
-#     # Draw on the screen a GREEN line from (0, 50) to (50, 80)
-#     # Because it is an antialiased line, it is 1 pixel wide.
-#     pygame.draw.aaline(screen, GREEN, [0, 50], [50, 80], True)
-#
-#     # Draw a rectangle outline
-#     pygame.draw.rect(screen, BLACK, [75, 10, 50, 20], 2)
-#
-#     # Draw a solid rectangle
-#     pygame.draw.rect(screen, BLACK, [150, 10, 50, 20])
-#
-#     # Draw a rectangle with rounded corners
-#     pygame.draw.rect(screen, GREEN, [115, 210, 70, 40], 10, border_radius=15)
-#     pygame.draw.rect(screen, RED, [135, 260, 50, 30], 0, border_radius=10, border_top_left_radius=0,
-#                      border_bottom_right_radius=15)
-#
-#     # Draw an ellipse outline, using a rectangle as the outside boundaries
-#     pygame.draw.ellipse(screen, RED, [225, 10, 50, 20], 2)
-#
-#     # Draw an solid ellipse, using a rectangle as the outside boundaries
-#     pygame.draw.ellipse(screen, RED, [300, 10, 50, 20])
-#
-#     # This draws a triangle using the polygon command
-#     pygame.draw.polygon(screen, BLACK, [[100, 100], [0, 200], [200, 200]], 5)
-#
-#     # Draw an arc as part of an ellipse.
-#     # Use radians to determine what angle to draw.
-#     pygame.draw.arc(screen, BLACK, [210, 75, 150, 125], 0, pi / 2, 2)
-#     pygame.draw.arc(screen, GREEN, [210, 75, 150, 125], pi / 2, pi, 2)
-#     pygame.draw.arc(screen, BLUE, [210, 75, 150, 125], pi, 3 * pi / 2, 2)
-#     pygame.draw.arc(screen, RED, [210, 75, 150, 125], 3 * pi / 2, 2 * pi, 2)
-#
-#     # Draw a circle
-#     pygame.draw.circle(screen, BLUE, [60, 250], 40)
-#
-#     # Draw only one circle quadrant
-#     pygame.draw.circle(screen, BLUE, [250, 250], 40, 0, draw_top_right=True)
-#     pygame.draw.circle(screen, RED, [250, 250], 40, 30, draw_top_left=True)
-#     pygame.draw.circle(screen, GREEN, [250, 250], 40, 20, draw_bottom_left=True)
-#     pygame.draw.circle(screen, BLACK, [250, 250], 40, 10, draw_bottom_right=True)
-#
-#     # Go ahead and update the screen with what we've drawn.
-#     # This MUST happen after all the other drawing commands.
-#     pygame.display.flip()
-#
-# # Be IDLE friendly
-# pygame.quit()
