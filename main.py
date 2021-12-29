@@ -270,7 +270,6 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.pos[0] < 800:
                     x, y = event.pos[0] // 160, event.pos[1] // 160
-                    # print(x, y, player.get_can_move((x, y)))
                     if len_of_action:
                         if player.get_can_move((x, y), board.board[x][y].color):
                             board.board[x][y].add_player(player)
