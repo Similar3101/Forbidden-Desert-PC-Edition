@@ -113,7 +113,8 @@ class Explorer(Player):
                 return True
         return False
 
-class Meterologist(Player):
+
+class Meteorologist(Player):
     '''Метеоролог
 белый, 4 воды'''
     def __init__(self, coords=(0, 0), color='white', canteen=4):
