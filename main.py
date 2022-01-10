@@ -180,6 +180,31 @@ class Place:
         self.players_on_place.append(player)
 
 
+class CardDeck:
+    def __init__(self, board, level=1):
+        self.board = board
+        self.level = level
+        self.deck_of_storm = []
+        self.deck_of_eqip = []
+        self.dict1 = {'1': 'right',
+                      '2': 'up',
+                      '3': 'left',
+                      '4': 'down'}
+
+    def get_stormcard(self):
+        last_card = self.deck_of_storm[0]
+        direction, len_of_move = self.dict1[last_card[0]], int(last_card[1])
+        return direction, len_of_move
+
+    def get_eqip(self):
+        pass
+
+    def can_move(self, card):
+        direction, len_of_move = card
+        if
+
+
+
 class Board:
     def krest(self, screen, coords, c='orange'):
         print(coords)
@@ -227,22 +252,6 @@ class Board:
                 if place.len_of_sandblock:
                     place.draw_sandblock()
 
-    def get_click(self, mouse_pos):
-        pos = self.get_cell(mouse_pos)
-        self.on_click(pos)
-
-    def on_click(self, cell_coords):
-        if cell_coords:
-            x, y = cell_coords
-            self.board[y][x] = not self.board[y][x]
-
-    def get_cell(self, mouse_pos):
-        cell_x = (mouse_pos[0] - self.left) // self.cell_size
-        cell_y = (mouse_pos[1] - self.top) // self.cell_size
-        if cell_x < 0 or cell_x >= self.width or cell_y < 0 or cell_y >= self.height:
-            return None
-        return cell_x, cell_y
-
 
 def lol():
     pygame.draw.rect(screen, 'blue', (850, 200, 150, 200), 5, border_radius=15)
@@ -256,6 +265,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('desert')
     board = Board()
     board.render(screen)
+    deck = CardDeck(board)
     pygame.draw.rect(screen, 'blue', (850, 200, 150, 200), 5, border_radius=15)
     pygame.draw.rect(screen, 'red', (850, 420, 150, 200), 5, border_radius=15)
     pygame.draw.line(screen, 'white', (820, 0), (820, 800), 20)
@@ -279,6 +289,11 @@ if __name__ == '__main__':
                             player.coords = x, y
                             len_of_action -= 1
                             print((x, y), (player.coords, board.board[x][y].players_on_place), len_of_action)
+                if not len_of_action:
+                    card = deck.get_stormcard()
+                    if deck.can_move(card):
+                        # deck
+                        pass
         screen.fill((0, 0, 0))
         lol()
         board.render(screen)
