@@ -123,9 +123,13 @@ class Player:
             self.remove_sand(place)
             return True
         elif place.type_of_place == '21.png' and False not in board.have_detail:
+            print('Вы смогли выбраться из Пустыни! Вы выиграли')
             pygame.quit()
+            exit()
         else:
             place.is_digged = True
+            if place.opened_image == 'asset\\3.png':
+                print(f'вы нашли колодец! ваш запас воды пополнен до {self.canteen}')
             if place.type_of_place not in ['yellow', 'red', 'orange', 'grey']:
                 place.get_coords_of_detail(board)
             return True
@@ -137,7 +141,14 @@ class Player:
                 if place.detail:
                     id = place.detail.pop(0)
                     board.have_detail[id[1] - 25] = True
+                    print('вы взяли деталь!')
                     return True
+                else:
+                    return False
+            else:
+                self.remove_sand(place)
+        else:
+            self.dig_place(place, board)
         return False
 
 
@@ -157,11 +168,15 @@ class Climber(Player):
     def __init__(self, place, coords=(0, 0), color='black', canteen=3):
         super().__init__(place, coords, color, canteen)
 
-    def get_can_move(self, coords, place):
+    def get_can_move(self, place):
         x1, y1 = self.coords
-        x2, y2 = coords
+        x2, y2 = place.coords
         if (abs(x1 - x2) == 1 and y1 == y2) or (abs(y1 - y2) == 1 and x1 == x2):
             if place.color != 'brown':
+                return True
+        elif self.place.opened_image == 'asset\\11.png' and self.place.is_digged:
+            if place.is_digged and place.opened_image == 'asset\\11.png':
+                self.place = place
                 return True
         return False
 
@@ -195,6 +210,9 @@ class Meteorologist(Player):
     def __init__(self, place, coords=(0, 0), color='white', canteen=4):
         super().__init__(place, coords, color, canteen)
 
+    def ungive_card(self, deck):
+        pass
+
 
 class Navigator(Player):
     '''Навигатор
@@ -202,6 +220,9 @@ class Navigator(Player):
 жёлтый, 4 воды'''
     def __init__(self, place, coords=(0, 0), color='yellow', canteen=4):
         super().__init__(place, coords, color, canteen)
+
+    def move_the_player(self, player):
+        pass
 
 
 class WaterCarrier(Player):
@@ -220,11 +241,11 @@ class Place:
         self.len_of_sandblock = 0
         self.is_digged = False
         self.can_move = True
-        self.closed_image = os.path.join('asset', self.color)
+        self.closed_image = os.path.join('asset', self.color if self.color in ['1.png', '22.png'] else '2.png')
         self.detail = []
         self.type_of_place = list_of_place[coords]
         self.opened_image = os.path.join('asset', dict_of_place[self.type_of_place])
-        self.players_on_place = [Explorer(self, coords=self.coords)] if self.type_of_place == 0 else []
+        self.players_on_place = [Climber(self, coords=self.coords)] if self.type_of_place == 0 else []
 
     def draw(self, size):
         a, b = self.coords
@@ -315,6 +336,7 @@ class CardDeck:
         self.deck_of_storm = deck_of_storm
         self.used_dos = []
         self.deck_of_eqip = []
+        self.minus = 0
         self.dict_of_direction = {'1': 'right',
                       '2': 'up',
                       '3': 'left',
@@ -367,19 +389,28 @@ class CardDeck:
         print(self.new_coords)
         return True
 
-    def get_len_stormcard(self, minus):
+    def get_len_stormcard(self):
         if self.level == 1:
-            return 2
+            return 2 - self.minus
         if self.level > 1 and self.level < 5:
-            return 3
+            if self.level == 2:
+                print('Буря стала сильнее')
+            return 3 - self.minus
         if self.level > 4 and self.level < 9:
-            return 4
+            if self.level == 5:
+                print('Буря стала ещё сильнее')
+            return 4 - self.minus
         if self.level > 8 and self.level < 12:
-            return 5
+            if self.level == 12:
+                print('Буря вновь стала сильнее. лучше поспешите!')
+            return 5 - self.minus
         if self.level > 11 and self.level < 14:
-            return 6
+            print(f'лучше поспешите! {14 - self.level} уровней осталось до пригрыша из-за слишком сильной бури')
+            return 6 - self.minus
         if self.level == 14:
+            print('вы слишком медленные (или вы не увидели тексты мои в программе). вы проиграли')
             pygame.quit()
+            exit()
 
     def move_the_storm(self, card):
         if self.get_can_move(card):
@@ -390,14 +421,22 @@ class CardDeck:
             old_place.replace_the_coords(new_place)
             a = old_place.add_sandblock()
             self.coords = self.new_coords
-        return x1, y1
+            return x1, y1
 
     def summon_sun(self, players):
+        print('Палящее Солнце!')
+        i = 1
         for player in players:
             if not player.in_tunnel:
                 player.canteen -= 1
-                if player.canteen == 0:
-                    pygame.quit()
+                print(f'Игрок {i} ({player.color}) не в тунеле. Количество его воды упало до {player.canteen}')
+            else:
+                print(f'Игрок {i} спасся в Туннеле. Количество его воды осталось {player.canteen}')
+            if player.canteen == 0:
+                pygame.quit()
+                print('закончилась вода (да, я  ещё не сделал анимацию для солнца)')
+                print('вы проиграли из-за солнца')
+                exit()
 
     def level_up(self):
         self.level += 1
@@ -493,10 +532,10 @@ if __name__ == '__main__':
     player = board.board[coords_of_player[0]][coords_of_player[1]].players_on_place[0]
     players = [player]
     len_of_action = 4
-    len_of_minus = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                print('вы вышли из игры... прогресс не сохраняется... чел...')
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.pos[0] < 800:
@@ -517,17 +556,17 @@ if __name__ == '__main__':
                                 action = player.remove_sand(place)
                                 print(place.len_of_sandblock)
                     len_of_action -= 1 if action else 0
-                    print(len_of_action)
                 if not len_of_action:
-                    for _ in range(deck.get_len_stormcard(len_of_minus)):
+                    for _ in range(deck.get_len_stormcard()):
                         card = deck.get_stormcard()
+                        print(card)
                         if len(card) == 2:
                             deck.move_the_storm(card)
                         elif card == 's':
-                            deck.summon_sun(which_player)
+                            deck.summon_sun(players)
                         elif card == 'l':
                             deck.level_up()
-                    len_of_minus = 0
+                    deck.minus = 0
                     len_of_action = 4
                     player = players[which_player if which_player < len(players) else 0]
         screen.fill((180, 100, 0))
